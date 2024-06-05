@@ -1,0 +1,14 @@
+{
+    "iterations": 6,
+    "execution_time": 12,
+    "config_path": "C:\\Users\\janst\\source\\studia\\psi\\c4\\C4 - ProjStru_aco\\ProjStru_aco\\mdvrp_ust.txt",
+    "result_path": "C:\\Users\\janst\\source\\studia\\psi\\c4\\C4 - ProjStru_aco\\ProjStru_aco\\mrowczenie.txt",
+    "log_path": "C:\\Users\\janst\\source\\studia\\psi\\c4\\logs\\",
+    "aco_ro": [0, 1],
+    "aco_alfa": [0, 2],
+    "aco_beta": [0, 2],
+    "aco_wsp_ob": [0, 2],
+    "osobniki": [2, 250],
+    "pokolenia": [2, 300],
+    "optimization_order": ["pokolenia", "osobniki", "aco_ro", "aco_alfa", "aco_beta", "aco_wsp_ob"]
+}
