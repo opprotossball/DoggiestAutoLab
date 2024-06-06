@@ -16,6 +16,7 @@ class AutoLab(threading.Thread):
         self.next_to_optimize = None
         self.params = {p: (settings[p][1] - settings[p][0]) / 2 for p in settings['optimization_order']}
         self.simulation = 0
+        self.prev_score = 999999
         self.averages = []
         self.bests = []
         self.worsts = []
@@ -36,32 +37,39 @@ class AutoLab(threading.Thread):
         r = self.settings[param][1]
         lmid = l + ((r - l) / 3)
         rmid = r - ((r - l) / 3)
-
         self.params[param] = lmid
         bl, wl, al = self.simulate()
-        lval = bl
-
+        lval = al
+        print(f'lmid score: {type(lval)} {lval:.3f}')
         self.params[param] = rmid
         br, wr, ar = self.simulate()
-        rval = br
-
-        # selects value with beter best score
-        if lval < rval:
-            self.settings[param][1] = rmid
-            self.bests.append(bl)
-            self.worsts.append(wl)
-            self.averages.append(al)
-        else:
-            self.bests.append(br)
-            self.worsts.append(wr)
-            self.averages.append(ar)    
-            if lval > rval:
-                self.settings[param][0] = lmid
-            else:
-                self.settings[param][0] = lmid
+        rval = ar
+        print(f'rmid score: {type(rval)} {rval:.3f}')
+        # selects value with better best score
+        if lval < self.prev_score or rval < self.prev_score:
+            if lval < rval:
+                print(f'{param}: {lmid} better than {rmid}')
                 self.settings[param][1] = rmid
-        self.params[param] = (self.settings[param][1] - self.settings[param][0]) / 2
-        print(f'Optimized {param}. New value: {self.params[param]}')
+                self.bests.append(bl)
+                self.worsts.append(wl)
+                self.averages.append(al)
+            else:
+                self.bests.append(br)
+                self.worsts.append(wr)
+                self.averages.append(ar)    
+                if lval > rval:
+                    print(f'{param}: {rmid} better than {lmid}')
+                    self.settings[param][0] = lmid
+                else:
+                    print(f'{param}: {lmid} as good as {rmid}')
+                    self.settings[param][0] = lmid
+                    self.settings[param][1] = rmid
+            self.prev_score = min(lval, rval)
+        else:
+            print('Both new values worse, continuig without changes')
+        # lmid or rmid
+        self.params[param] = self.settings[param][0] + (self.settings[param][1] - self.settings[param][0]) / 2
+        print(f'Optimized {param}. New value: {self.params[param]:.3f}')
 
     def simulate(self):
         print(f'Starting simulation {self.simulation}')
@@ -100,7 +108,7 @@ class AutoLab(threading.Thread):
             f.writelines(updated_lines)
 
     def run(self):
-        print('Autolab will start in 7 seconds. Place cursor on optimalization button.')
+        print('Auto Lab will start in 7 seconds. Place cursor on optimalization button.')
         time.sleep(7)
         print('Auto Lab started')
         while self.simulation < self.settings['iterations']:
